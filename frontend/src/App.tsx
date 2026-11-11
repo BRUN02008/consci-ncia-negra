@@ -143,7 +143,7 @@ type QuizQuestion = {
 
 const questions: QuizQuestion[] = [
   {
-    q: "Em que ano Mary Jackson ingressou na NACA?",
+    q: "Em que ano Mary Jackson ingressou na NASA?",
     a: ["1943", "1951", "1958", "1969"],
     correct: 1,
     why: "Em 1951, ela entrou para a NASA como matemática de pesquisa.",
