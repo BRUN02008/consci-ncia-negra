@@ -194,12 +194,12 @@
     radial-gradient(ellipse at 52% 62%, #243d5a 0 24%, transparent 24.5%),
     linear-gradient(145deg, #536b7b, #192c45 55%, #101b2a);
 }
-.portrait-art {
+.portrait-frame img {
   width: 100%;
   height: 100%;
-  background: radial-gradient(ellipse at 52% 35%, #c09b79 0 10%, transparent 10.5%),
-    radial-gradient(ellipse at 52% 62%, #314d6b 0 24%, transparent 24.5%),
-    linear-gradient(145deg, #657987, #243c55 58%, #101b2a);
+  object-fit: cover;
+  object-position: 57% center;
+  filter: sepia(0.12) contrast(1.06);
 }
 .portrait-frame::after {
   content: "";
@@ -508,12 +508,12 @@
     radial-gradient(ellipse at 56% 66%, #263d58 0 27%, transparent 27.5%),
     linear-gradient(145deg, #627586, #1a2d46 58%, #101b2a);
 }
-.tribute-art {
+.tribute-image img {
   width: 100%;
   height: 100%;
-  background: radial-gradient(ellipse at 56% 32%, #b29a83 0 11%, transparent 11.5%),
-    radial-gradient(ellipse at 56% 66%, #344b64 0 27%, transparent 27.5%),
-    linear-gradient(145deg, #73818a, #2a3b4e 58%, #101b2a);
+  object-fit: cover;
+  object-position: 65% center;
+  filter: grayscale(1) contrast(1.1);
 }
 .tribute-image::after {
   content: "";

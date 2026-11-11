@@ -129,17 +129,24 @@ const stationData = [
     icon: "quiz" as IconName,
     code: "QUIZ / 06",
     title: "Desafio do Conhecimento",
-    blurb: "Teste sua missão: cinco perguntas para concluir a visita.",
+    blurb: "Teste sua missão: dez perguntas para concluir a visita.",
     tag: "MISSÃO FINAL",
   },
 ];
 
-const questions = [
+type QuizQuestion = {
+  q: string;
+  a: string[];
+  correct: number;
+  why: string;
+};
+
+const questions: QuizQuestion[] = [
   {
     q: "Em que ano Mary Jackson ingressou na NACA?",
     a: ["1943", "1951", "1958", "1969"],
     correct: 1,
-    why: "Em 1951, ela entrou para a NACA como matemática de pesquisa.",
+    why: "Em 1951, ela entrou para a NASA como matemática de pesquisa.",
   },
   {
     q: "Qual marco Mary alcançou em 1958?",
@@ -180,7 +187,55 @@ const questions = [
     correct: 1,
     why: "Mary e suas colegas receberam a Medalha de Ouro do Congresso dos Estados Unidos.",
   },
+  {
+    q: "Em qual instituição Mary Jackson concluiu sua graduação em 1942?",
+    a: ["Hampton Institute", "Howard University", "Tuskegee Institute", "Virginia State College"],
+    correct: 0,
+    why: "Mary se formou no Hampton Institute em matemática e ciências físicas, preparando-se para uma carreira científica.",
+  },
+  {
+    q: "Na equação do arrasto, mantendo os demais fatores constantes, o que ocorre se a velocidade do ar dobrar?",
+    a: ["O arrasto dobra", "O arrasto cai pela metade", "O arrasto quadruplica", "O arrasto não muda"],
+    correct: 2,
+    why: "Como a velocidade aparece elevada ao quadrado na equação, dobrá-la multiplica o arrasto por quatro, se os demais fatores não mudarem.",
+  },
+  {
+    q: "O número de Mach compara a velocidade de uma aeronave com qual referência?",
+    a: ["A velocidade do som", "A velocidade de rotação da Terra", "A velocidade do vento no solo", "A velocidade de escape da Terra"],
+    correct: 0,
+    why: "O número de Mach é a razão entre a velocidade do objeto e a velocidade local do som; Mach 1 corresponde à velocidade do som.",
+  },
+  {
+    q: "Após atuar como engenheira, como Mary ampliou seu impacto profissional na NASA?",
+    a: ["Ajudou mulheres e minorias a avançarem na carreira", "Criou o programa de astronautas", "Passou a comandar missões espaciais", "Fundou uma universidade"],
+    correct: 0,
+    why: "No fim da carreira, Mary trabalhou em programas de igualdade de oportunidades, apoiando o crescimento profissional de mulheres e minorias na NASA.",
+  },
+  {
+    q: "Que homenagem à trajetória de Mary Jackson foi inaugurada em 2021?",
+    a: ["O edifício-sede da NASA em Washington recebeu seu nome", "Um telescópio espacial foi batizado em sua homenagem", "O Centro Espacial Kennedy passou a levar seu nome", "Uma missão tripulada foi dedicada a ela"],
+    correct: 0,
+    why: "Em 2021, a sede da NASA em Washington, D.C., foi nomeada Edifício Mary W. Jackson para reconhecer seu legado.",
+  },
 ];
+
+function shuffle<T>(items: T[]): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function shuffleQuestion(question: QuizQuestion): QuizQuestion {
+  const answers = shuffle(question.a.map((text, index) => ({ text, isCorrect: index === question.correct })));
+  return {
+    ...question,
+    a: answers.map(({ text }) => text),
+    correct: answers.findIndex(({ isCorrect }) => isCorrect),
+  };
+}
 
 function Biography() {
   return (
@@ -204,7 +259,7 @@ function Biography() {
           </div>
           <div>
             <span>ATUAÇÃO</span>
-            <strong>NACA / NASA Langley</strong>
+            <strong>NASA Langley</strong>
             <small>Matemática de pesquisa e engenheira</small>
           </div>
         </div>
@@ -213,7 +268,7 @@ function Biography() {
         <span className="chapter">CAPÍTULO 01</span>
         <p>
           Após trabalhar como professora, secretária e contadora, Mary chegou em 1951 à unidade de
-          Computação da Área Oeste da NACA — grupo formado por matemáticas negras que realizavam
+          Computação da Área Oeste da NASA — grupo formado por matemáticas negras que realizavam
           cálculos essenciais à pesquisa aeronáutica.
         </p>
         <p>
@@ -338,7 +393,7 @@ function Timeline() {
       "Nasce em Hampton",
       "Mary Winston nasce na Virgínia, em um período de forte segregação racial.",
     ],
-    ["1951", "Ingressa na NACA", "Começa como matemática de pesquisa na Computação da Área Oeste."],
+    ["1951", "Ingressa na NASA", "Começa como matemática de pesquisa na Computação da Área Oeste."],
     ["1958", "Torna-se engenheira", "É promovida e se torna a primeira engenheira negra da NASA."],
     [
       "1979",
@@ -433,18 +488,19 @@ function Curiosities() {
 }
 
 function Quiz({ onComplete }: { onComplete: () => void }) {
+  const [quizQuestions, setQuizQuestions] = useState(() => shuffle(questions).map(shuffleQuestion));
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const finished = step === questions.length;
+  const finished = step === quizQuestions.length;
   function answer(i: number) {
     if (selected !== null) return;
     setSelected(i);
-    if (i === questions[step].correct) setScore((s) => s + 1);
+    if (i === quizQuestions[step].correct) setScore((s) => s + 1);
   }
   function next() {
-    if (step === questions.length - 1) {
-      setStep(questions.length);
+    if (step === quizQuestions.length - 1) {
+      setStep(quizQuestions.length);
       onComplete();
     } else {
       setStep((s) => s + 1);
@@ -455,6 +511,7 @@ function Quiz({ onComplete }: { onComplete: () => void }) {
     setStep(0);
     setSelected(null);
     setScore(0);
+    setQuizQuestions(shuffle(questions).map(shuffleQuestion));
   }
   if (finished)
     return (
@@ -463,9 +520,9 @@ function Quiz({ onComplete }: { onComplete: () => void }) {
           <Icon name="check" size={46} />
         </div>
         <p className="eyebrow">MISSÃO CONCLUÍDA</p>
-        <h3>{score}/5 respostas corretas</h3>
+        <h3>{score}/10 respostas corretas</h3>
         <p>
-          {score === 5
+          {score === quizQuestions.length
             ? "Excelente! Seu conhecimento alcançou novas órbitas."
             : score >= 3
               ? "Muito bem! Você está pronto para explorar novos horizontes."
@@ -476,13 +533,13 @@ function Quiz({ onComplete }: { onComplete: () => void }) {
         </button>
       </div>
     );
-  const q = questions[step];
+  const q = quizQuestions[step];
   return (
     <div className="quiz-wrap">
       <div className="quiz-top">
-        <span>PERGUNTA {String(step + 1).padStart(2, "0")} / 05</span>
+        <span>PERGUNTA {String(step + 1).padStart(2, "0")} / {String(quizQuestions.length).padStart(2, "0")}</span>
         <div>
-          {questions.map((_, i) => (
+          {quizQuestions.map((_, i) => (
             <i key={i} className={i <= step ? "active" : ""} />
           ))}
         </div>
@@ -517,7 +574,7 @@ function Quiz({ onComplete }: { onComplete: () => void }) {
           </strong>
           <p>{q.why}</p>
           <button onClick={next}>
-            {step === 4 ? "VER RESULTADO" : "PRÓXIMA PERGUNTA"} <Icon name="arrow" />
+            {step === quizQuestions.length - 1 ? "VER RESULTADO" : "PRÓXIMA PERGUNTA"} <Icon name="arrow" />
           </button>
         </div>
       )}
@@ -586,7 +643,10 @@ function App() {
             <div className="orbit orbit-a" />
             <div className="orbit orbit-b" />
             <div className="portrait-frame">
-              <div className="portrait-art" aria-hidden="true" />
+              <img
+                src="/mary-jackson.jpg"
+                alt="Mary Jackson trabalhando no Centro de Pesquisa Langley da NASA"
+              />
               <div className="scan-line" />
               <span className="frame-label">
                 MARY W. JACKSON
@@ -684,7 +744,7 @@ function App() {
       </section>
       <section className="tribute">
         <div className="tribute-image">
-          <div className="tribute-art" aria-hidden="true" />
+          <img src="/mary-jackson.jpg" alt="Retrato histórico de Mary Jackson na NASA" />
           <span>1921 — 2005</span>
         </div>
         <div>
